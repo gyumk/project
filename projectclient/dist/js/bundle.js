@@ -10342,14 +10342,6 @@ const mainSlideBtnFunction = (function(){
 mainSlidePrevBtn.onclick = mainSlideBtnFunction.clickMainSlidePrev;
 mainSlideNextBtn.onclick = mainSlideBtnFunction.clickMainSlideNext;
 
-mainSlideNumber.onclick = e =>{
-  if( !e.target.matches(".main-silde-numbering > li > a") ) return;
-  [...mainSlideNumber.children].forEach( (li, idx) => {
-    if(li === e.target.parentNode){
-      mainSlideBtnFunction.clickMainSlidePrev(idx);
-    }
-  })
-};
 const makeMainSlide = async() => {
   let {data} = await axios.get("http://localhost:9000/post");
   console.log(data[0]);
@@ -10385,7 +10377,7 @@ const makeMainSlide = async() => {
               </div>
               </li>`;  
       count === 10 ? count = 1: ++count ;
-      count2 < 3? ++count2 : count2 = 1;
+      count2 < 3 ? ++count2 : count2 = 1;
       return;
     }
     html += `<div class="main-slide slide${count2}-2">
@@ -10401,7 +10393,37 @@ const makeMainSlide = async() => {
     ++count;
   })
   mainUl.innerHTML = html;
+  if(Kakao.Auth.getAccessToken()){
+    Kakao.API.request({
+    url:'/v2/user/me',
+    success: res => {
+      loginInfo = JSON.parse(JSON.stringify(res))
+      console.log(loginInfo);
+      Kakao.API.request({
+        url:'/v2/user/me',
+        success: res => {
+          loginInfo = JSON.parse(JSON.stringify(res));
+          sideInfo.innerHTML = `<img class="kakao-profile-Img" src=${loginInfo.properties.thumbnail_image}></img>
+          <p class="slogan">${loginInfo.kakao_account.email}</p>
+          <p class="slogan-writer">${loginInfo.properties.nickname}</p>
+          <a id="brunchSigninButton" href="javascript:logoutFormWithKakao()" 
+          class="#side_request btn_apply_author"><button
+                  class="btn-request">로그아웃하기</button></a>`;
+          loginstateBtn.innerHTML = `<a href="javascript:logoutFormWithKakao()" class="f-r btn-request btn-default">로그아웃</a>`
+        }
+        ,fail: err => {
+          console.log(JSON.stringify(err))
+        }
+      })
+      // checkLogin.innerHTML= loginInfo.properties.nickname;
+      // kakaoImg.innerHTML = `<img src="${loginInfo.properties.thumbnail_image}"/>`
+    }
+    ,fail: err => {
+      console.log(JSON.stringify(err))
+    }
+  })}
 }
+window.addEventListener("load",makeMainSlide);
 window.onload = makeMainSlide;
 
 let intervalTime = (notice.length+1)*7000
@@ -10413,6 +10435,48 @@ setInterval(() => {
     },7000)
   })
 }, intervalTime);
+
+// kakaologin
+
+// checkLogOut.onclick = ()=> {
+//   if(!Kakao.Auth.getAccessToken()) {
+//     console("로그인 안대어 있어요");
+//     return;
+//   }
+//   Kakao.Auth.logout(function() {
+//     alert('logout ok\naccess token -> ' + Kakao.Auth.getAccessToken())
+//   })
+// };
+
+
+// let loginInfo ={}
+// Kakao.init('1a86de1b6c01f3317b9730ffd02df7f2');
+// function loginFormWithKakao() {
+//   if(Kakao.Auth.getAccessToken()) {
+//     console.log("이미 로그인댐");
+//     console.log(Kakao.Auth.getAccessToken());
+//     return;
+//   }
+//   Kakao.Auth.loginForm({
+//     success: function(authObj) {
+//       Kakao.API.request({
+//         url:'/v2/user/me',
+//         success: res => {
+//           loginInfo = JSON.parse(JSON.stringify(res))
+//           console.log(loginInfo);
+//           checkLogin.innerHTML= loginInfo.properties.nickname;
+//           kakaoImg.innerHTML = `<img src="${loginInfo.properties.thumbnail_image}"/>`
+//         }
+//         ,fail: err => {
+//           console.log(JSON.stringify(err))
+//         }
+//       })
+//     },
+//     fail: function(err) {
+//       alert(JSON.stringify(err))
+//     },
+//   })
+// }
 
 /***/ }),
 
@@ -10550,7 +10614,80 @@ window.addEventListener('load',function() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+// 서브(캐러셀) 슬라이드 
+const $carouselWindow = document.querySelector('.window-article');
+const $carouselUl = document.querySelector('.list-article');
+const $slides = document.querySelectorAll('.list-article li')
 
+// 서브 슬라이드 버튼
+const $prevBtn = document.querySelector('.prev-btn');
+const $nextBtn = document.querySelector('.next-btn');
+
+// 페이지 상단 이동 버튼
+const $topBtn = document.querySelector('.top-btn');
+
+
+const getArticles = async () => {
+  let {data} = await axios.get("http://localhost:9000/post");
+  console.log(data[0]);
+  let html = '';
+  data[0].forEach(({
+    content,
+    name,
+    source,
+    title
+  }) => {
+    html += `<li class="reset-list">
+      <a href="#" target="_blank">
+      <img src="/projectclient/style/images/subslide/${source}" alt="#">
+      <strong class="tit-subject">${title}</strong>
+      <p class="desc-article">${content}</p>
+      <span class="info-by">
+      <span class="icon-by">by</span>
+      &nbsp;${name}</span>
+      </a></li>`
+  });
+  $carouselUl.innerHTML = html;
+};
+window.onload = getArticles;
+
+
+let num = 0
+$nextBtn.onclick = () => {
+  num++;
+  if (num === 1) {
+    $prevBtn.classList.toggle("hidden");
+  }
+  $carouselUl.style.transform = `translateX(-${num*960}px)`;
+  if (num === 7) {
+    $nextBtn.classList.toggle("hidden")
+  }
+};
+
+$prevBtn.onclick = () => {
+  num--;
+  if (num === 6) {
+    $nextBtn.classList.toggle("hidden")
+  }
+  $carouselUl.style.transform = `translateX(-${num*960}px)`;
+  if (num === 0) {
+    $prevBtn.classList.toggle("hidden")
+  }
+}
+
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset > 1500){
+    $topBtn.style.position = 'absolute';
+    $topBtn.style.transition = 'top 1s ease-in 1s';
+    $topBtn.style.animation = 'showup 0.3s linear alternate forwards';
+  } else {
+    $topBtn.style.position = 'relative';
+  }
+})
+
+$topBtn.onclick = () => {
+  window.scrollTo(0, 1);
+}
 
 /***/ }),
 
@@ -10561,7 +10698,78 @@ window.addEventListener('load',function() {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
+const openSidebar = document.querySelector(".btn-menu.img-ico");
+const banner = document.querySelector(".banner");
+const link1 = document.querySelector(".link-page.link-page1");
+const link2 = document.querySelector(".link-page.link-page2");
+const $sidemenu = document.getElementById("sidemenu");
+const sbanner = document.querySelector(".link-banner.link-bnr-s");
+const sbnr1 = document.getElementById("s1");
+const sbnr2 = document.getElementById("s2");
 
+openSidebar.onclick = (e) => {
+    document.getElementById("sidemenu").classList.add("open");
+    banner.style.marginTop = "-420px";
+    sbnr1.style.opacity = "1";
+    sbnr2.style.opacity = "1";
+    e.stopPropagation();
+
+    const foo = ({
+        target
+    }) => {
+        if (target === $sidemenu) return;
+        document.getElementById("sidemenu").classList.remove("open");
+        document.removeEventListener("click", foo);
+    };
+    document.addEventListener("click", foo);
+};
+
+const btnClose = () => {
+    banner.style.marginTop = "-420px";
+    sbnr1.style.opacity = "1";
+    sbnr2.style.opacity = "1";
+};
+
+link1.onclick = () => {
+    document
+        .getElementById("item1")
+        .setAttribute("style", "z-index: 2");
+    document
+        .getElementById("item2")
+        .setAttribute("style", "z-index: 1");
+    sbnr1.style.opacity = "0";
+
+};
+
+link2.onclick = () => {
+    document
+        .getElementById("item1")
+        .setAttribute("style", "z-index: 1");
+    document
+        .getElementById("item2")
+        .setAttribute("style", "z-index: 2");
+    sbnr2.style.opacity = "0";
+};
+
+
+window.addEventListener("load", function () {
+    window.scrollTo({
+        top: 1,
+        left: 0,
+        behavior: "smooth",
+    });
+    console.log(window.scrollY);
+});
+window.addEventListener("scroll", function () {
+
+    if (window.scrollY <= 1) {
+        console.log("1");
+        sbnr1.style.opacity = "0";
+        sbnr2.style.opacity = "0";
+        banner.style.marginTop = "0px";
+        banner.style.transition = "0.5s ease-in-out";
+    }
+});
 
 /***/ }),
 
@@ -10624,3 +10832,54 @@ module.exports = __webpack_require__(/*! ./src/js/main.js */"./src/js/main.js");
 
 /******/ });
 //# sourceMappingURL=bundle.js.map
+Kakao.init('1a86de1b6c01f3317b9730ffd02df7f2');
+
+const sideInfo = document.querySelector(".side-profile");
+const loginstateBtn = document.getElementById("loginState")
+let loginInfo ={}
+function loginFormWithKakao() {
+  if(Kakao.Auth.getAccessToken()) {
+    console.log("이미 로그인댐");
+    console.log(Kakao.Auth.getAccessToken());
+    return;
+  }
+  Kakao.Auth.loginForm({
+    success: function(authObj) {
+      Kakao.API.request({
+        url:'/v2/user/me',
+        success: res => {
+          loginInfo = JSON.parse(JSON.stringify(res));
+          sideInfo.innerHTML = `<img class="kakao-profile-Img" src=${loginInfo.properties.thumbnail_image}></img>
+          <p class="slogan">${loginInfo.kakao_account.email}</p>
+          <p class="slogan-writer">${loginInfo.properties.nickname}</p>
+          <a id="brunchSigninButton" href="javascript:logoutFormWithKakao()" 
+          class="#side_request btn_apply_author"><button
+                  class="logined btn-request">로그아웃하기</button></a>`;
+          loginstateBtn.innerHTML = `<a href="javascript:logoutFormWithKakao()" class="f-r btn-request btn-default">로그아웃</a>`
+        }
+        ,fail: err => {
+          console.log(JSON.stringify(err))
+        }
+      })
+    },
+    fail: function(err) {
+      alert(JSON.stringify(err))
+    },
+  })
+}
+const logoutFormWithKakao = ()=> {
+  Kakao.Auth.logout(function() {
+    sideInfo.innerHTML = `<div class="logo-service"></div>
+    <p class="slogan">You can make anything<br />by writing</p>
+    <p class="slogan-writer">- C.S.Lewis -</p>
+    <a id="brunchSigninButton" href="javascript:loginFormWithKakao()" class="#side_request btn_apply_author"><button
+            class="btn-request">브런치 시작하기</button></a>`;
+    loginstateBtn.innerHTML = `<a href="javascript:loginFormWithKakao()" class="f-r btn-request btn-default">시작하기</a>`
+    alert("로그아웃 되었습니다.");
+  })
+}
+const banner = document.querySelector('.banner')
+
+const btnClose = () => {
+    banner.style.marginTop = "-420px"
+};

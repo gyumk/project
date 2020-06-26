@@ -1,5 +1,5 @@
 @import url("https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css");
-
+/* 
 /* reset layout */
 html {
   font-size: 10px;
@@ -55,104 +55,16 @@ a {
   font-family: "Nanum Myeongjo", sans-serif;
 }
 
-/* reset */
-/* body, */
-div,
-dl,
-dt,
-dd,
-ul,
-ol,
-li,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-pre,
-code,
-form,
-fieldset,
-legend,
-textarea,
-p,
-blockquote,
-th,
-td,
-input,
-select,
-textarea,
-button {
+.side-service-menu > ul {
   margin: 0;
   padding: 0;
-  font-family: "Noto Sans DemiLight", "Malgun Gothic";
 }
-
-fieldset,
-img {
-  border: 0 none;
-}
-
-dl,
-ul,
-ol,
-menu,
-li {
-  list-style: none;
-}
-
-blockquote,
-q {
-  quotes: none;
-}
-
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: "";
-  content: none;
-}
-
-input,
-select,
-textarea,
-button {
-  vertical-align: middle;
-}
-
 button {
   border: 0 none;
   background-color: transparent;
   cursor: pointer;
   outline: none;
   border-radius: 0px;
-}
-
-body {
-  background: #fff;
-  color: #333;
-}
-
-body,
-th,
-td,
-input,
-select,
-textarea,
-button {
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-a:active,
-a:hover {
-  text-decoration: none;
-}
-
-a:active {
-  background-color: transparent;
 }
 
 .screen-out {
@@ -167,7 +79,10 @@ a:active {
 .f-l {
   float: left;
 }
-
+.f-l > .f-l {
+  margin: 0;
+  padding: 0;
+}
 .f-r {
   float: right;
 }
@@ -207,13 +122,15 @@ a:active {
 .banner {
   overflow: hidden;
   position: relative;
-  margin-top: 0px;
+  margin-top: -420px;
 }
 
 .banner .list-banner {
   width: 100%;
   height: 480px;
   overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .banner .item-banner {
@@ -234,6 +151,15 @@ a:active {
 
 .item-banner .item2 {
   z-index: 1;
+}
+
+.banner .link-banner {
+  width: 100%;
+  display: block;
+  text-align: center;
+  height: 100%;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
 }
 
 .banner .link-banner {
@@ -272,6 +198,7 @@ a:active {
   position: absolute;
   bottom: 0;
   height: 60px;
+  opacity: 1;
 }
 
 .banner .link-bnr-s .txt-banner {
@@ -493,7 +420,8 @@ a:active {
 }
 
 #sidemenu .side-service-menu li.hr {
-  background: url(//t1.daumcdn.net/brunch/static/img/help/pc/ico_sidebar.png) center no-repeat;
+  background: url(//t1.daumcdn.net/brunch/static/img/help/pc/ico_sidebar.png)
+    center no-repeat;
   height: 15px;
   margin: 30px auto 32px;
   padding: 0;
