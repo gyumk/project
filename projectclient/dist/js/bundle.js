@@ -10849,6 +10849,7 @@ function loginFormWithKakao() {
         url:'/v2/user/me',
         success: res => {
           loginInfo = JSON.parse(JSON.stringify(res));
+          console.log(loginInfo);
           sideInfo.innerHTML = `<img class="kakao-profile-Img" src=${loginInfo.properties.thumbnail_image}></img>
           <p class="slogan">${loginInfo.kakao_account.email}</p>
           <p class="slogan-writer">${loginInfo.properties.nickname}</p>
