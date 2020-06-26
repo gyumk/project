@@ -104,8 +104,6 @@ const render = async (category, keyword) => {
     </li>`;
     });
     $writersList.innerHTML = html;
-
-
 };
 
 window.addEventListener('load', function () {
