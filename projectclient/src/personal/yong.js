@@ -13,7 +13,7 @@ openSidebar.onclick = (e) => {
     sbnr1.style.opacity = "1";
     sbnr2.style.opacity = "1";
     e.stopPropagation();
-
+ 
     const foo = ({
         target
     }) => {
